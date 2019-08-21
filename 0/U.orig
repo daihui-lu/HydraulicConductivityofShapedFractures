@@ -1,0 +1,114 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "../parameters.H"
+H 0.001;
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+  
+    inlet
+    {
+        type            fixedProfile;
+        profile         polynomial
+        (
+            ((#calc "3/2*$aveVel" 0 0)        (0 0 0))
+            ((#calc "-3/2*$aveVel/pow($H,2)" 0 0)	 (2 0 0))
+        );
+	direction        (0 0 1);
+        origin           #calc "$H"; // h0 = 1mm
+//	origin           0;
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+    lowerWall
+    {
+        type            codedFixedValue;
+        value           uniform (0 0 0);
+        name            BJSlip;
+        codeInclude     #{
+		#include "fvCFD.H"
+		#include <cmath>
+		#include <iostream>
+		#include "fieldTypes.H"
+		#include "volFields.H"
+		#include "surfaceFields.H"
+		#include "symmTransformField.H"
+		#include "fieldTypes.H"
+		//#include "singlePhaseTransportModel.H"
+	#};
+        code            #{
+	
+		const fvPatch& boundaryPatch = patch();
+		const vectorField& Cf = boundaryPatch.Cf();
+		vectorField& field = *this;
+
+		const scalar slipFactor_ = 0.00001;
+		const scalar alpha_ = 0; // depth gradient of the cell
+		const scalar v_0 = 0; // velocity scale on the permeation direction
+
+		vectorField nHat = this->patch().nf(); 
+		vectorField gradient = this->snGrad();
+		gradient = transform(I - sqr(nHat), gradient);
+
+		const scalar epsilon = 0.00001; //aspect ratio of the cell
+    		vectorField gradientDirection = gradient / (mag(gradient) + SMALL);
+
+	 	vectorField ux = -slipFactor_* mag(gradient)*gradientDirection; // slip velocity at the boundary
+
+		scalar uy = 0;
+
+		forAll(Cf,faceI)
+		{
+			uy = v_0*4*pow(1+alpha_/epsilon*Cf[faceI].x(), 2) * alpha_/epsilon/(6*slipFactor_ + 2*pow(1+alpha_/epsilon*Cf[faceI].x(), 2));// permeation velocity at the boundary			
+		}
+		vectorField vw = uy*nHat;
+		//Eq. 2-125 Leal's book
+
+		field = ux - vw;// plus or minus?? nHat goes outside or inside?
+	#};
+        codeOptions     #{
+		-I$(LIB_SRC)/finiteVolume/lnInclude \
+		-I$(LIB_SRC)/meshTools/lnInclude
+	#};
+        codeLibs        #{
+		-lmeshTools \
+			-lfiniteVolume
+	#};
+    }
+    upperWall
+    {
+        type            symmetryPlane;
+    }
+    frontWall
+    {
+        type            cyclic;
+    }
+    backWall
+    {
+        type            cyclic;
+    }
+}
+
+
+// ************************************************************************* //

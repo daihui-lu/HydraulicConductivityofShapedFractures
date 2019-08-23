@@ -74,13 +74,13 @@ boundaryField
 		const scalar epsilon = 0.00001; //aspect ratio of the cell
     		vectorField gradientDirection = gradient / (mag(gradient) + SMALL);
 
-	 	vectorField ux = -slipFactor_* mag(gradient)*gradientDirection; // slip velocity at the boundary
+	 	vectorField ux = -slipFactor_* mag(gradient)*gradientDirection; // slip velocity at the boundary = slip coefficient * velocity gradient
 
 		scalar uy = 0;
 
 		forAll(Cf,faceI)
 		{
-			uy = v_0*4*pow(1+alpha_/epsilon*Cf[faceI].x(), 2) * alpha_/epsilon/(6*slipFactor_ + 2*pow(1+alpha_/epsilon*Cf[faceI].x(), 2));// permeation velocity at the boundary			
+			uy = v_0*4*pow(1+alpha_/epsilon*Cf[faceI].x(), 2) * alpha_/epsilon/(6*slipFactor_ + 2*pow(1+alpha_/epsilon*Cf[faceI].x(), 2));// permeation velocity at the boundary 			
 		}
 		vectorField vw = uy*nHat;
 		//Eq. 2-125 Leal's book

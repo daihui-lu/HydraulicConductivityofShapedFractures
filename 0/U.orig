@@ -34,7 +34,6 @@ boundaryField
         );
 	direction        (0 0 1);
         origin           #calc "$H"; // h0 = 1mm
-//	origin           0;
     }
 
     outlet

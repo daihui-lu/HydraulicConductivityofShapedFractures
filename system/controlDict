@@ -16,7 +16,7 @@ FoamFile
 
 application     pimpleFoam;
 
-startFrom       latestTime;
+startFrom       startTime;
 
 startTime       0;
 
@@ -28,7 +28,7 @@ deltaT          1e-3;
 
 writeControl    runTime;
 
-writeInterval   0.1;
+writeInterval   1e-02;
 
 purgeWrite      0;
 

@@ -21,15 +21,15 @@ solvers
         solver          GAMG;
         smoother        DIC;
         tolerance       1e-6;
-        relTol          0.05;
+        relTol          1e-2;
     }
 
     "(U|sigma)"
     {
-        solver          smoothSolver;
+        solver          GAMG;
         smoother        symGaussSeidel;
         tolerance       1e-6;
-        relTol          0.1;
+        relTol          1e-3;
     }
 
     pFinal
@@ -47,20 +47,29 @@ solvers
 
 PIMPLE
 {
-    momentumPredictor   off;
-    nOuterCorrectors    15;
-    nCorrectors         3;
+    momentumPredictor   on;
+    nOuterCorrectors    100;
+    nCorrectors         5;
     nNonOrthogonalCorrectors 0;
     pRefCell            0;
     pRefValue           0;
     turbOnFinalIterOnly no;
+    outerCorrectorResidualControl
+    {
+        "sigma.*"
+            {
+                    tolerance  1e-05;
+                    relTol     0;
+            }
+    }
+
 }
 
 relaxationFactors
 {
     equations
     {
-        ".*"   1;
+        ".*"   0.3;
     }
 }
 

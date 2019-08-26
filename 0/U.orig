@@ -14,7 +14,7 @@ FoamFile
     object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-#include "../parameters.H"
+aveVel 1;
 H 0.001;
 
 dimensions      [0 1 -1 0 0 0 0];
@@ -23,7 +23,7 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-  
+
     inlet
     {
         type            fixedProfile;
@@ -42,58 +42,8 @@ boundaryField
     }
     lowerWall
     {
-        type            codedFixedValue;
-        value           uniform (0 0 0);
-        name            BJSlip;
-        codeInclude     #{
-		#include "fvCFD.H"
-		#include <cmath>
-		#include <iostream>
-		#include "fieldTypes.H"
-		#include "volFields.H"
-		#include "surfaceFields.H"
-		#include "symmTransformField.H"
-		#include "fieldTypes.H"
-		//#include "singlePhaseTransportModel.H"
-	#};
-        code            #{
-	
-		const fvPatch& boundaryPatch = patch();
-		const vectorField& Cf = boundaryPatch.Cf();
-		vectorField& field = *this;
+        #include "../runtimeC++/BJSlipCodedBC.H"
 
-		const scalar slipFactor_ = 0.00001;
-		const scalar alpha_ = 0; // depth gradient of the cell
-		const scalar v_0 = 0; // velocity scale on the permeation direction
-
-		vectorField nHat = this->patch().nf(); 
-		vectorField gradient = this->snGrad();
-		gradient = transform(I - sqr(nHat), gradient);
-
-		const scalar epsilon = 0.00001; //aspect ratio of the cell
-    		vectorField gradientDirection = gradient / (mag(gradient) + SMALL);
-
-	 	vectorField ux = -slipFactor_* mag(gradient)*gradientDirection; // slip velocity at the boundary = slip coefficient * velocity gradient
-
-		scalar uy = 0;
-
-		forAll(Cf,faceI)
-		{
-			uy = v_0*4*pow(1+alpha_/epsilon*Cf[faceI].x(), 2) * alpha_/epsilon/(6*slipFactor_ + 2*pow(1+alpha_/epsilon*Cf[faceI].x(), 2));// permeation velocity at the boundary 			
-		}
-		vectorField vw = uy*nHat;
-		//Eq. 2-125 Leal's book
-
-		field = ux - vw;// plus or minus?? nHat goes outside or inside?
-	#};
-        codeOptions     #{
-		-I$(LIB_SRC)/finiteVolume/lnInclude \
-		-I$(LIB_SRC)/meshTools/lnInclude
-	#};
-        codeLibs        #{
-		-lmeshTools \
-			-lfiniteVolume
-	#};
     }
     upperWall
     {

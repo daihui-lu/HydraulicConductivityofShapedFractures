@@ -18,15 +18,8 @@ simulationType laminar;
 
 laminar
 {
-    laminarModel        Maxwell;
+    laminarModel        Newtownian;
 
-    MaxwellCoeffs
-    {
-        nuM             1;
-        lambda          5;
-    }
-
-    printCoeffs         on;
 }
 
 // ************************************************************************* //

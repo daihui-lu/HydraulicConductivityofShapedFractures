@@ -1,0 +1,90 @@
+/*-----------------------------------------------------------------------------/
+Name:
+    BJSlip
+
+Description:
+
+Author:
+    Daihui Lu, Purdue University (2019)
+/-----------------------------------------------------------------------------*/
+
+type            codedMxed;
+value           uniform (0 0 0);
+name            BJSlip;
+
+codeInclude
+#{
+    #include "fvCFD.H"
+    #include <cmath>
+    #include <iostream>
+    #include "fieldTypes.H"
+    #include "volFields.H"
+    #include "surfaceFields.H"
+    #include "symmTransformField.H"
+    #include "fieldTypes.H"
+//#include "singlePhaseTransportModel.H"
+#};
+
+code
+#{
+
+    const fvPatch& boundaryPatch = patch();
+    const vectorField& Cf = boundaryPatch.Cf();
+    //vectorField& field = *this;
+    //vectorField u_wallslip_lastiteration = (*this); // slip velocity of last iteration
+
+    const scalar slipFactor_ = 0.00001;
+    const scalar alpha_ = 0; // depth gradient of the cell
+//    const scalar v_0 = 0.001; // velocity scale on the permeation direction
+
+    vectorField nHat = this->patch().nf(); // face normal vector
+    vectorField gradient = this->snGrad(); // du/dn
+    gradient = transform(I - sqr(nHat), gradient);// tangential component
+    vectorField gradientDirection = gradient / (mag(gradient) + SMALL);
+
+    const scalar epsilon = 0.005; //aspect ratio of the cell
+    const scalar v_0 = epsilon*1.0; // velocity scale on the permeation direction
+
+    // slip velocity at the boundary = slip coefficient * velocity gradient
+    vectorField u_wallslip = -slipFactor_* mag(gradient)*gradientDirection;
+
+    scalarField uy(patch().size(),scalar(0));
+
+    forAll(Cf,faceI)
+    {
+        // permeation velocity at the boundary
+    	uy[faceI] =0.0;
+/*
+	    v_0
+	*
+	(
+	    scalar(1.)+ (alpha_/epsilon)*Cf[faceI].x()
+	)
+	/
+	(
+	    3.*slipFactor_+(scalar(1.)+ (alpha_/epsilon)*Cf[faceI].x())
+	)
+	*
+	(
+	    alpha_/epsilon
+	);
+*/
+
+    }
+    vectorField vw = uy*nHat; //nHat points into inside of the domain
+    //Eq. 2-125 Leal's book
+
+    operator==relaxationFactor_*u_wallslip_iteration + (1.0-relaxationFactor_)*u_wallslip - vw;// 
+#};
+
+codeOptions
+#{
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude
+#};
+
+codeLibs
+#{
+    -lmeshTools \
+	-lfiniteVolume
+#};

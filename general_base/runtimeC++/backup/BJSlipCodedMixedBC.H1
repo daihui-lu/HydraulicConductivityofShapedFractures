@@ -1,0 +1,101 @@
+/*-----------------------------------------------------------------------------/
+Name:
+    BJSlip
+
+Description:
+
+Author:
+    Daihui Lu, Purdue University (2019)
+/-----------------------------------------------------------------------------*/
+
+type            codedFixedValue;
+value           uniform 0;
+name            BJSlip;
+
+codeInclude
+#{
+    #include "fvCFD.H"
+    #include <cmath>
+    #include <iostream>
+    #include "fieldTypes.H"
+    #include "volFields.H"
+    #include "surfaceFields.H"
+    #include "symmTransformField.H"
+    #include "fieldTypes.H"
+#};
+
+code
+#{
+       Info <<"\n Start reading code... " << endl;
+//    const IOdictionary& d = static_cast<const IOdictionary&>(dict);
+//    const fvMesh& mesh = refCast<const fvMesh>(d.db());
+
+    const fvPatch& boundaryPatch = patch();
+    const vectorField& Cf = boundaryPatch.Cf();
+    vectorField& field = *this;
+
+    const scalar slipFactor_ = 0.00001;
+    const scalar alpha_ = 0; // depth gradient of the cell
+    const scalar epsilon = 0.005; //aspect ratio of the cell
+    const scalar v_0 = epsilon*1.0; // velocity scale on the permeation direction
+       Info <<"\n const scalar checked! " << endl;
+
+
+
+//    volVectorField U = mesh.lookupObject<volVectorField>("U");
+//    volVectorField::Boundary bfld = U.boundaryFieldRef();
+ //   label patchi = mesh.boundaryMesh().findPatchID()
+
+
+       Info <<"\n volVectorField checked! " << endl;
+ //   vectorField ux = U.component(0);
+    vectorField gradient = this->snGrad(); //du/dn
+    vectorField nHat = this->patch().nf(); // face normal vector
+
+   // gradient = transform(I - sqr(nHat), gradient);// tangential component
+  //  vectorField gradientDirection = gradient / (mag(gradient) + SMALL);
+  //  vectorField tangentialDirection = transform(I - sqr(nHat));
+
+    // slip velocity at the boundary = slip coefficient * velocity gradient
+    vectorField u_wallslip = slipFactor_* mag(gradient) * transform(I - sqr(nHat));
+
+    scalarField uy(patch().size(),scalar(0));
+
+    forAll(Cf,faceI)
+    {
+        // permeation velocity at the boundary
+    	uy[faceI] =0.0;
+/*
+	    v_0
+	*
+	(
+	    scalar(1.)+ (alpha_/epsilon)*Cf[faceI].x()
+	)
+	/
+	(
+	    3.*slipFactor_+(scalar(1.)+ (alpha_/epsilon)*Cf[faceI].x())
+	)
+	*
+	(
+	    alpha_/epsilon
+	);
+*/
+
+    }
+    vectorField vw = uy*nHat; //nHat points into inside of the domain
+    //Eq. 2-125 Leal's book
+
+    operator==u_wallslip - vw;// 
+#};
+
+codeOptions
+#{
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude
+#};
+
+codeLibs
+#{
+    -lmeshTools \
+	-lfiniteVolume
+#};

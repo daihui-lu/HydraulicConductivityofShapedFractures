@@ -54,6 +54,7 @@ codeWrite
 	//- Create fields for samples
 	vectorField gradPSample(nSamples,vector::zero);
 	vectorField USample(nSamples,vector::zero);
+	scalarField pSample(nSamples,0);
 
 	//- Create field to store volumes
 	scalarField volSample(nSamples,small);
@@ -68,6 +69,7 @@ codeWrite
 		//- Add values to sample fields
 		gradPSample[sampleID] += gradP[cellI]*V[cellI];
 		USample[sampleID] += U[cellI]*V[cellI];
+		pSample[sampleID] += p[cellI]*V[cellI];
 		volSample[sampleID] += V[cellI];		
 	}
 
@@ -75,6 +77,7 @@ codeWrite
   	reduce(gradPSample,sumOp<vectorField>());
 	reduce(USample,sumOp<vectorField>());
 	reduce(volSample,sumOp<scalarField>());
+	reduce(pSample,sumOp<scalarField>());
 
 	//- Write to file (master processor only)
   	if(Pstream::master())
@@ -97,6 +100,7 @@ codeWrite
 			//- Write header line 
   			file() <<"Time\t"
 			  	   <<"coord\t"
+				   <<"p\t"
 			  	   <<"gradPx\t"
 				   <<"gradPy\t"
 				   <<"gradPz\t"
@@ -126,13 +130,14 @@ codeWrite
 			file() << minCoord + (scalar(i)+scalar(.5))*delta <<"\t" ;
 			
 			//Write samples
-			file() << gradPSample[i].x()/volSample[i] << "\t"
-				   << gradPSample[i].y()/volSample[i] << "\t"
-				   << gradPSample[i].z()/volSample[i] << "\t"
-				   << USample[i].x()/volSample[i]     << "\t"
-				   << USample[i].y()/volSample[i]     << "\t"
-				   << USample[i].z()/volSample[i]     << "\t"
-				   << volSample[i]                << "\n";
+			file() << pSample[i]/volSample[i] << "t"
+			       << gradPSample[i].x()/volSample[i] << "\t"
+			       << gradPSample[i].y()/volSample[i] << "\t"
+			       << gradPSample[i].z()/volSample[i] << "\t"
+			       << USample[i].x()/volSample[i]     << "\t"
+			       << USample[i].y()/volSample[i]     << "\t"
+			       << USample[i].z()/volSample[i]     << "\t"
+			        << volSample[i]                   << "\n";
         }
   	}
 

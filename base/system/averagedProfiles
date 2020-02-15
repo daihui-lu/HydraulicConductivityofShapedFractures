@@ -130,7 +130,7 @@ codeWrite
 			file() << minCoord + (scalar(i)+scalar(.5))*delta <<"\t" ;
 			
 			//Write samples
-			file() << pSample[i]/volSample[i] << "t"
+			file() << pSample[i]/volSample[i] << "\t"
 			       << gradPSample[i].x()/volSample[i] << "\t"
 			       << gradPSample[i].y()/volSample[i] << "\t"
 			       << gradPSample[i].z()/volSample[i] << "\t"

@@ -22,13 +22,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         1;
+endTime         5;
 
-deltaT          1e-3;
+deltaT          1e-1;
 
 writeControl    runTime;
 
-writeInterval   1e-01;
+writeInterval   1;
 
 purgeWrite      0;
 
@@ -49,6 +49,7 @@ functions
     #includeFunc residuals
     #includeFunc singleGraph
     #includeFunc probes
+    #includeFunc averagedProfiles
 }
 
 // ************************************************************************* //

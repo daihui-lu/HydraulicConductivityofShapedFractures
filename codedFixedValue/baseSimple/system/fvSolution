@@ -19,16 +19,16 @@ solvers
     p
     {
         solver          GAMG;
-        smoother        DIC;
+        smoother         DIC;
         tolerance       1e-8;
         relTol          0;
-        maxIter         5;
+        maxIter         10;
     }
 
     "U"
     {
-        solver          GAMG;
-        smoother        DILU;
+        solver          PBiCGStab;
+        preconditioner  DILU;
         tolerance       1e-8;
         relTol          0;
     }
@@ -50,7 +50,7 @@ PIMPLE
 {
     momentumPredictor   on;
     nOuterCorrectors    100000;
-    nCorrectors         2;
+    nCorrectors         3;
     nNonOrthogonalCorrectors 0;
     pRefCell            0;
     pRefValue           0;
@@ -83,6 +83,11 @@ SIMPLE
 
 relaxationFactors
 {
+    fields
+    {
+        p               1;
+        U               1;
+    }
     equations
     {
         U               0.9;

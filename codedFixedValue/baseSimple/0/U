@@ -22,7 +22,7 @@ boundaryField
 {
     wall
    {
-        type           codedFixedValue;
+        type         codedFixedValue;
 
         value        uniform (0 0 0);
 
@@ -39,10 +39,13 @@ boundaryField
             const vectorField slipVelocity
             (
                 -phiFac*transform(I - sqr(nHat),this->snGrad())
-            ); 
-
-
-            operator==((pif&sqr(nHat)) + slipVelocity);
+            );
+            
+            //- Use relaxation to improve convergence
+            //- This allows a gentle transition from fixedValue to BJF
+            scalar omega(0.1);
+            
+            operator==( (*this)*(scalar(1.)-omega) + omega*(pif&sqr(nHat)) + slipVelocity);
             
         #};
 

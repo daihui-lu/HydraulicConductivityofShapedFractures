@@ -23,10 +23,10 @@ License
 
 Description
     This boundary condition provides a slip condition on the form of the
-    first order Beaver Josepsh Saffmann interface between a clear fluid and 
+    first order Beaver Josepsh Saffmann interface between a clear fluid and
     a porous medium
         \f[
-            U_p= - \phi (I - nn) \cdot \nabla_\perp U + nn \cdot U_c 
+            U_p= - \phi (I - nn) \cdot \nabla_\perp U + nn \cdot U_c
         \f]
 
     where
@@ -36,11 +36,16 @@ Description
         \phi  | slip coefficient
         I     | identity matrix
         n     | face normal vector
- 
+
     \endvartable
 
-    Notice that, as a consequence, the gradient normal to the patch is set to
-    zero.
+    Notice that it is possible to switch the condotion for the face-normal
+    velocity from flully permeable to impermeable by simply adjusting a
+    parameter \alpha.
+
+    Specifically:
+    \alpha = 1 corresponds to a fully permeable medium
+    \alpha = 0 corresponds to a completely impermeable medium
 
     This boundary condition is derived from fixedValue and it is explicit.
     Thus, the condition on the pressure field will be fixedFluxPressure in most
@@ -50,6 +55,7 @@ Usage
     \table
         Property     | Description             | Required    | Default value
         slipCoeff    | slipCoefficient         | yes         |
+        alpha        | permeability coefficient| yes         |
     \endtable
 
 SourceFiles
@@ -60,7 +66,7 @@ Author
 
 References
     Bottaro, A. (2019). Flow over natural or engineered surfaces: an adjoint
-    homogenization perspective. J. Fluid Mech, 877, 1. 
+    homogenization perspective. J. Fluid Mech, 877, 1.
     https://doi.org/10.1017/jfm.2019.607
 
 
@@ -87,7 +93,10 @@ class porousInterfaceBJS
 // Private data
 
     //- Slip coefficient
-    scalarField     slipCoeff_;     
+    scalarField     slipCoeff_;
+
+    //- Permeability coefficient
+    scalarField     alpha_;
 
 public:
 
@@ -175,6 +184,20 @@ public:
         {
             return slipCoeff_;
         }
+
+        //- Return permeability coefficient
+        virtual scalarField& alpha()
+        {
+            return alpha_;
+        }
+
+        virtual const scalarField& alpha() const
+        {
+            return alpha_;
+        }
+
+        //- Write
+        virtual void write(Ostream&) const;
 };
 
 
@@ -187,4 +210,3 @@ public:
 #endif
 
 // ************************************************************************* //
-

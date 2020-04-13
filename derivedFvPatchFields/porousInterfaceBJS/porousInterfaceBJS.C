@@ -55,7 +55,8 @@ porousInterfaceBJS::porousInterfaceBJS
 )
 :
     fixedValueFvPatchField<vector>(p, iF),
-    slipCoeff_(p.size())
+    slipCoeff_(p.size()),
+    alpha_(p.size())
 {
 }
 
@@ -69,7 +70,8 @@ porousInterfaceBJS::porousInterfaceBJS
 )
 :
     fixedValueFvPatchField<vector>(ptf, p, iF, mapper),
-    slipCoeff_(mapper(ptf.slipCoeff_))
+    slipCoeff_(mapper(ptf.slipCoeff_)),
+    alpha_(mapper(ptf.alpha_))
 {
 }
 
@@ -82,7 +84,8 @@ porousInterfaceBJS::porousInterfaceBJS
 )
 :
     fixedValueFvPatchField<vector>(p, iF, dict),
-    slipCoeff_("slipCoeff", dict, p.size())
+    slipCoeff_("slipCoeff", dict, p.size()),
+    alpha_("alpha", dict, p.size())
 {
 }
 
@@ -93,7 +96,8 @@ porousInterfaceBJS::porousInterfaceBJS
 )
 :
     fixedValueFvPatchField<vector>(ptf),
-    slipCoeff_(ptf.slipCoeff_)
+    slipCoeff_(ptf.slipCoeff_),
+    alpha_(ptf.alpha_)
 {
 }
 
@@ -105,7 +109,8 @@ porousInterfaceBJS::porousInterfaceBJS
 )
 :
     fixedValueFvPatchField<vector>(ptf, iF),
-    slipCoeff_(ptf.slipCoeff_)
+    slipCoeff_(ptf.slipCoeff_),
+    alpha_(ptf.alpha_)
 {
 }
 
@@ -126,7 +131,7 @@ void porousInterfaceBJS::updateCoeffs()
     }
 
     const vectorField nHat(this->patch().nf());
-    const vectorField pif(this->patchInternalField());  
+    const vectorField pif(this->patchInternalField());
 
     //- Coefficients are updated based on a discretized gradient
     //
@@ -135,7 +140,7 @@ void porousInterfaceBJS::updateCoeffs()
     //  Since we already know that (I-nn)&U_p is slipVel, we can write:
     //
     //  slipVel*(1.0 + slipCoeff*Delta) = slipCoeff*Delta*(I-nn)&U_c
-    // 
+    //
     //  Resulting in the expression below.
 
     const vectorField slipVelocity
@@ -149,16 +154,23 @@ void porousInterfaceBJS::updateCoeffs()
           scalar(1.0) + slipCoeff() * this->patch().deltaCoeffs()
         )
     );
-    
+
     //- Here the normal velocity is simply the normal component of the
     //  internal field (i.e., zero normal gradient)
 
     const vectorField normalVelocity(pif&sqr(nHat));
 
     //- Finally, the boundary velocity is computed
-    operator==(normalVelocity + slipVelocity);
+    operator==(alpha()*normalVelocity + slipVelocity);
 
     this->fixedValueFvPatchField<vector>::updateCoeffs();
+}
+
+void porousInterfaceBJS::write(Ostream& os) const
+{
+    fixedValueFvPatchField<vector>::write(os);
+    writeEntry(os, "slipCoeff", slipCoeff());
+    writeEntry(os, "alpha", alpha());
 }
 
 
@@ -167,4 +179,3 @@ void porousInterfaceBJS::updateCoeffs()
 } // End namespace Foam
 
 // ************************************************************************* //
-

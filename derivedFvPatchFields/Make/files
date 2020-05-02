@@ -1,3 +1,4 @@
 porousInterfaceBJS/porousInterfaceBJS.C
+porousInterfaceBJS/porousInterfaceBJSGrad.C
 
 LIB = $(FOAM_USER_LIBBIN)/libPorousBJS

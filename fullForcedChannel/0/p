@@ -22,8 +22,8 @@ boundaryField
 {
     walls
     {
-      //  type            fixedFluxPressure;
-        type            codedMixed;
+        type            fixedFluxPressure;
+      //  type            codedMixed;
 
         refValue        uniform 0;
         refGradient     uniform 0;
@@ -34,13 +34,13 @@ boundaryField
         code
         #{
             //- Permeability coefficient
-            scalar K(0);
+            scalar K(1e-5);
             
             const fvsPatchField<scalar>& phi=
                 patch().lookupPatchField<surfaceScalarField, scalar>("phi");
 
             
-            this->refGrad() = - K*phi;
+            this->refGrad() = -K*phi;
          //   this->valueFraction() = 1.0;
         #};
 

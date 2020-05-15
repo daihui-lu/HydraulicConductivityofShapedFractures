@@ -70,7 +70,7 @@ PIMPLE
 
 SIMPLE
 {
-    nNonOrthogonalCorrectors 2;
+    nNonOrthogonalCorrectors 5;
     consistent true;
 
     residualControl
@@ -88,12 +88,12 @@ relaxationFactors
 {
     fields
     {
-        p      1;
+        p      0.3;
         pFinal  1;
     }
     equations
     {
-        "U|k|epsilon"     0.5;
+        "U|k|epsilon"     0.3;
         "(U|k|epsilon)Final"   1;
     }
 }

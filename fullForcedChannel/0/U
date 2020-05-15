@@ -23,9 +23,10 @@ boundaryField
     walls
    {
         type        porousInterfaceBJS;
-        value        uniform (1 0 0);
+        value        uniform (0 0 0);
 
-        alpha       1;
+        //gradN       uniform 0.0001;
+        alpha       uniform 1;
         slipCoeff   uniform 0.02;
 
     }
@@ -33,8 +34,8 @@ boundaryField
 
     inlet
     {
-        type            zeroGradient;//fixedProfile;//fixedValue;
-        value           uniform (1 0 0);
+        type           fixedProfile;//fixedValue;
+        value           uniform (0 0 0);
 
         profile         polynomial
         (
@@ -47,8 +48,8 @@ boundaryField
 
     outlet
     {
-        type            zeroGradient;//pressureInletOutletVelocity;
-        value           uniform (0 0 0);
+        type            pressureInletOutletVelocity;
+        value           uniform (1 0 0);
 
     }
 

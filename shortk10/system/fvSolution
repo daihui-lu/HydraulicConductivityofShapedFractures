@@ -29,6 +29,7 @@ solvers
     "U"
     {
         solver          GAMG;
+        preconditioner  DILU;
         smoother         DILU;
         tolerance       1e-8;
         relTol          0;
@@ -51,7 +52,7 @@ solvers
 PIMPLE
 {
     nNonOrthogonalCorrectors 0;
-    nCorrectors          100;
+    nCorrectors          10;
     nOuterCorrectors    50;
 
     outerCorrectorResidualControl
@@ -89,7 +90,7 @@ relaxationFactors
 {
     fields
     {
-        p      0.2;
+        p      0.9;
         pFinal  1;
     }
     equations

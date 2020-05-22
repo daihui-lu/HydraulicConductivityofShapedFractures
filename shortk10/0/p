@@ -22,8 +22,8 @@ boundaryField
 {
     walls
     {
-      //  type            fixedFluxPressure;
-        type            codedMixed;
+        type            fixedFluxPressure;
+      //  type            codedMixed;
 
         refValue        uniform 0;
         refGradient     uniform 0;
@@ -49,12 +49,11 @@ boundaryField
     inlet
     {
         type            fixedFluxPressure;
-        value           uniform 100;
     }
 
     outlet
     {
-        type            fixedValue;
+        type            zeroGradient;
         value              uniform 0;
 
     }

@@ -48,42 +48,52 @@ runTimeModifiable true;
 functions
 {
 
-//    #includeFunc averagedProfiles
+    //- This function writes the permeation velocity as a function of the
+    //  x-coordinate.
+    //  Output is in the format x-coordinate, velocity, z coordinate
+    permeationV
+    {
+        libs        ("libutilityFunctionObjects.so");
 
-//    permeationV
-//    {
- //       libs        ("libutilityFunctionObjects.so");
+        type coded;
 
-   //     type coded;
-        // Name of on-the-fly generated functionObject
-    //    name permeationV;
-     //   codeWrite
-//        #{
-            // Lookup U
-       //     const volVectorField& U = mesh().lookupObject<volVectorField>("U");
+        name permeationV;
+        codeWrite
+        #{
+            //- Lookup U
+            const volVectorField& U = mesh().lookupObject<volVectorField>("U");
 
-            //Get outlet patch
-	 //       label patchId = mesh().boundaryMesh().findPatchID("walls");
-         //   const fvPatchVectorField& UBf = U.boundaryField()[patchId];
+            //- Get wall patch
+            label patchId = mesh().boundaryMesh().findPatchID("walls");
 
-	   //     const scalarField V = UBf&UBf.patch().nf();
-         //   const vectorField x = UBf.patch().Cf();
+            //- Get velocity field at the boundary
+            const fvPatchVectorField& UBf = U.boundaryField()[patchId];
 
+            //- The permeation velocity is simply the velocity normal to the
+            //  patch
+            const scalarField V = UBf&UBf.patch().nf();
 
-           // if(mesh().time().write())
-           // {
-             //   std::ofstream file;
-               // file.open("permeationVel.dat", std::ios::out | std::ios::trunc);
-           //     forAll(x,xi)
-             //   {
-               //     file << x[xi][2]
-                 //       << " " << V[xi] <<"\n";
-           //     }
-          //  }
-      //  #};
+            //- This vector represents the spatial coordinates of the faces
+            const vectorField x = UBf.patch().Cf();
 
- //   }
+            //- Write file if it is time to write
+            //  This is csv format
+            if(mesh().time().write())
+            {
+                std::ofstream file;
+                file.open("permeationVel.csv", std::ios::out | std::ios::trunc);
 
+                //- Write all the faces
+                forAll(x,xi)
+                {
+                   file<< x[xi][0]  //- x coordinate
+                       << " , " << V[xi] //- Permeation velocity
+                       << " , " << x[xi][2] << "\n"; //- z coordinate
+                }
+            }
+        #};
+
+    }
 
 }
 

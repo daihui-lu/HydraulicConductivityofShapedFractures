@@ -23,26 +23,7 @@ boundaryField
     walls
     {
         type            fixedFluxPressure;
-      //  type            codedMixed;
 
-        refValue        uniform 0;
-        refGradient     uniform 0;
-        valueFraction   uniform 0;
-
-        name    rampedMixed;   // name of generated BC
-
-        code
-        #{
-            //- Permeability coefficient
-            scalar K(1e10);
-            
-            const fvsPatchField<scalar>& phi=
-                patch().lookupPatchField<surfaceScalarField, scalar>("phi");
-
-            
-            this->refGrad() = - K*phi;
-         //   this->valueFraction() = 1.0;
-        #};
 
     }
 
@@ -53,8 +34,8 @@ boundaryField
 
     outlet
     {
-        type            zeroGradient;
-        value              uniform 0;
+        type            fixedValue;//zeroGradient;
+        value   uniform 0;
 
     }
 

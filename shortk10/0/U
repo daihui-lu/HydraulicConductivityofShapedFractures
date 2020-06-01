@@ -33,7 +33,7 @@ boundaryField
 
     inlet
     {
-        type            zeroGradient;//fixedProfile;//fixedValue;
+        type            fixedProfile;//fixedValue;
         value           uniform (1 0 0);
 
         profile         polynomial

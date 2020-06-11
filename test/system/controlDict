@@ -49,7 +49,6 @@ functions
 {
 
     #includeFunc averagedProfiles
-
     //- This function writes the permeation velocity as a function of the
     //  x-coordinate.
     //  Output is in the format x-coordinate, velocity, z coordinate

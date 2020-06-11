@@ -6,8 +6,8 @@ cd ${0%/*} || exit 1    # Run from this directory
 
 runApplication blockMesh
 runApplication $(getApplication)
-runApplication -s sample  postProcess -func sample
-runApplication -s perm  postProcess -func permeationV
+runApplication -s sample1  postProcess -func sample
+runApplication -s sample2  postProcess -func permeationV
 
 
 #------------------------------------------------------------------------------

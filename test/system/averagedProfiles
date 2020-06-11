@@ -21,7 +21,7 @@ codeWrite
 	const vector sampDir(1,0,0);
 
 	//- Number of samples (it can be the number of cells in x direction)
-	const label nSamples(100);		
+	const label nSamples(1000);		
 
 	//------------------------------------------------------------------------//
 

@@ -16,7 +16,7 @@ FoamFile
 #include "../parameters.H"
 
 convertToMeters 1;
-// alpha   -0.0005;
+//alpha   -0.0005;
 Lx 100;
 Lz  #calc "1.0 + $Lx*$alpha";
 Lz0 #calc "-1.0 - $Lx*$alpha";

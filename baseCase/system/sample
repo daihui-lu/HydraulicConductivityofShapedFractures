@@ -28,8 +28,8 @@ sets
     {
         type    lineFace;
         axis    z;
-        start   (50 0 -1);
-        end     (50 0 1);
+        start   (10 0 -1);
+        end     (10 0 1);
         nPoints 100;
     }
 );

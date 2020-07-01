@@ -10,21 +10,34 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      decomposeParDict;
+    location    "system";
+    object      sample;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "../parameters.H"
+L  50;
+z0  #calc "1.0 + $L*$alpha";
+z1 #calc "-1.0 - $L*$alpha";	
 
-numberOfSubdomains  7;
+type sets;
+libs            ("libsampling.so");
 
+interpolationScheme cellPointFace;
 
+setFormat       raw;
 
-method              simple;
+sets
+(
+    data
+    {
+        type    lineFace;
+        axis    z;
+        start   ($L 0 $z0);
+        end     ($L 0 $z1);
+        nPoints 100;
+    }
+);
 
-simpleCoeffs
-{
-    n               (7 1 1); // total must match numberOfSubdomains
-    delta           0.001;
-}
-
+fields          (U);
 
 // ************************************************************************* //

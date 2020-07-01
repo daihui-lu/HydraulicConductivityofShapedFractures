@@ -15,9 +15,9 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 #include "../parameters.H"
-
-z0  #calc "1.0 + 50*$alpha";
-z1 #calc "-1.0 - 50*$alpha";	
+L  20;
+z0  #calc "1.0 + L*$alpha";
+z1 #calc "-1.0 - L*$alpha";	
 
 type sets;
 libs            ("libsampling.so");
@@ -32,8 +32,8 @@ sets
     {
         type    lineFace;
         axis    z;
-        start   (50 0 $z0);
-        end     (50 0 $z1);
+        start   ($L 0 $z0);
+        end     ($L 0 $z1);
         nPoints 100;
     }
 );

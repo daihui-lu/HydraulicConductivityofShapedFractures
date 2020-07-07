@@ -8,4 +8,5 @@ To preproduce the results,
 3. Collect data for post-processing: run collectData.py
 
 
-https://zenodo.org/record/3934416#.XwSnGpNKjGK
+[![DOI](https://zenodo.org/badge/203642746.svg)](https://zenodo.org/badge/latestdoi/203642746)
+
